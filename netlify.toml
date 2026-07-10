@@ -1,0 +1,12 @@
+# The Corporate Supplier Sustainability Portal 2026
+# Static SPA. No backend, no functions, no environment variables.
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Single-URL app: static assets (the workbook, the PDFs) are matched first;
+# any other path falls back to the app shell.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
