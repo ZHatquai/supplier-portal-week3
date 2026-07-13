@@ -1,14 +1,12 @@
-import { useState } from 'react'
 import Nav from './Nav.jsx'
 import Footer from './Footer.jsx'
 
-// The v1.0 landing content, ported verbatim into React. Two mandated changes:
-//  • Route A (EcoVadis) CTA opens ecovadis.com in a new tab.
-//  • Route B (questionnaire) CTA reads "Complete the Questionnaire" and opens
-//    the in-portal Door Selection; the v1.0 email-return copy is removed.
-export default function Landing({ onComplete, onHome }) {
-  const [choice, setChoice] = useState(null) // null | 'yes' | 'no'
-
+// The landing content, ported from v1.0/v2.0. v3.0 change: the two separate
+// action buttons (Submit EcoVadis Scorecard / Complete the Questionnaire) and the
+// qualification Yes/No question are replaced by a single CTA into the Supplier
+// Gate, where every visitor identifies themselves first. The informational copy
+// describing the two onward paths is kept as context above the single button.
+export default function Landing({ onBegin, onHome }) {
   return (
     <>
       <Nav onHome={onHome} />
@@ -120,80 +118,31 @@ export default function Landing({ onComplete, onHome }) {
             <p className="tc-subhead mb-md">Your Submission Path</p>
             <h2 className="tc-h2">Two routes. One destination.</h2>
             <p className="tc-body mt-md" style={{ color: 'var(--tc-stone)', fontSize: 14 }}>
-              We respect your time. If you already hold a current EcoVadis Scorecard, you have an
-              expedited path. Answer the question below to find out where to start.
+              We respect your time. Begin by telling us who you are — then, depending on whether you
+              already hold a current EcoVadis Scorecard, you will either submit that scorecard or
+              complete the questionnaire. Both paths start from the same place below.
             </p>
           </div>
 
-          {/* Qualification question */}
-          <div className="tree-question-card">
-            <div className="tree-question-label">Step 1 of 2 — Qualification Check</div>
-            <div className="tree-question-text">
-              Do you hold a valid EcoVadis Scorecard issued within the last 12 months?
-            </div>
-            <div className="tree-btn-group">
-              <button
-                type="button"
-                className="tree-btn tree-btn-yes"
-                onClick={() => setChoice('yes')}
-              >
-                Yes, I Have a Scorecard
-              </button>
-              <button
-                type="button"
-                className="tree-btn tree-btn-no"
-                onClick={() => setChoice('no')}
-              >
-                No, I Don't
-              </button>
-            </div>
-          </div>
-
-          {/* Connector */}
-          <div className="tree-connector" style={{ display: choice ? 'flex' : 'none' }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M12 5v14M5 12l7 7 7-7" />
-            </svg>
-          </div>
-
-          {/* Two paths */}
+          {/* Two paths — informational context only; the single CTA below leads
+              every visitor into the Supplier Gate, which routes them by their
+              EcoVadis answer. */}
           <div className="tree-paths">
             {/* Path A — EcoVadis */}
-            <div
-              className={
-                'tree-path' +
-                (choice === 'yes' ? ' highlighted' : '') +
-                (choice === 'no' ? ' dimmed' : '')
-              }
-            >
+            <div className="tree-path">
               <div className="tree-path-badge"><span>Path A — EcoVadis</span></div>
               <div className="tree-path-title">Submit Your Scorecard</div>
               <div className="tree-path-body">
                 Suppliers with a current EcoVadis Scorecard (score ≥ 45) are exempt from the detailed
-                technical questionnaire. Simply submit your scorecard and our Procurement team will be
-                in touch to confirm your status.
+                technical questionnaire. You will be directed to submit your scorecard, and our
+                Procurement team will be in touch to confirm your status.
                 <br /><br />
                 Estimated time: <strong style={{ color: 'var(--tc-ink)', fontWeight: 500 }}>5 minutes</strong>
               </div>
-              <a
-                href="https://ecovadis.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="tc-btn-primary"
-                style={{ width: '100%', textAlign: 'center', display: 'block', padding: 14 }}
-              >
-                Submit EcoVadis Scorecard
-              </a>
             </div>
 
             {/* Path B — Full Assessment */}
-            <div
-              className={
-                'tree-path' +
-                (choice === 'no' ? ' highlighted' : '') +
-                (choice === 'yes' ? ' dimmed' : '')
-              }
-            >
+            <div className="tree-path">
               <div className="tree-path-badge badge-b"><span>Path B — Full Assessment</span></div>
               <div className="tree-path-title">Complete the Questionnaire</div>
               <div className="tree-path-body">
@@ -203,20 +152,17 @@ export default function Landing({ onComplete, onHome }) {
                 <br /><br />
                 Estimated time: <strong style={{ color: 'var(--tc-ink)', fontWeight: 500 }}>45–60 minutes</strong>
               </div>
-              <button
-                type="button"
-                className="tc-btn-secondary"
-                style={{ width: '100%', textAlign: 'center', display: 'block', padding: 14 }}
-                onClick={onComplete}
-              >
-                Complete the Questionnaire
-              </button>
             </div>
           </div>
 
-          {/* Reset */}
-          <div className={'tree-reset' + (choice ? ' visible' : '')}>
-            <button type="button" onClick={() => setChoice(null)}>Start Over</button>
+          {/* Single CTA into the Supplier Gate */}
+          <div className="landing-cta">
+            <button type="button" className="tc-btn-primary" onClick={onBegin}>
+              Begin Your Submission
+            </button>
+            <p className="landing-cta-note">
+              Takes under a minute to start. No login required.
+            </p>
           </div>
         </div>
       </section>
