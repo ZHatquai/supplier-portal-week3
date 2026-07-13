@@ -1,9 +1,23 @@
+import { useState } from 'react'
 import AnswersReview from './AnswersReview.jsx'
 
 // Door 2 — Review. Shows what was parsed from a structurally matching file,
 // blanks shown as empty, before the supplier submits. They can go back to
 // re-upload a corrected file.
 export default function Door2Review({ result, onSubmit, onReupload }) {
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+
+  const handleSubmit = async () => {
+    setSubmitError('')
+    setSubmitting(true)
+    const { error } = await onSubmit()
+    setSubmitting(false)
+    if (error) {
+      setSubmitError('We could not save your submission just now. Please try again.')
+    }
+  }
+
   return (
     <div className="app-main">
       <button type="button" className="app-backlink" onClick={onReupload}>← Back to upload a different file</button>
@@ -20,10 +34,16 @@ export default function Door2Review({ result, onSubmit, onReupload }) {
 
       <AnswersReview answers={result.answers} notes={result.notes} />
 
+      {submitError && (
+        <div className="gate-submit-error" role="alert">{submitError}</div>
+      )}
+
       <div className="wizard-nav">
         <button type="button" className="tc-btn-ghost" onClick={onReupload}>Upload a different file</button>
         <div className="wizard-nav-hint">Blank answers are accepted. Submit when the review looks right.</div>
-        <button type="button" className="tc-btn-primary" onClick={onSubmit}>Submit questionnaire</button>
+        <button type="button" className="tc-btn-primary" onClick={handleSubmit} disabled={submitting}>
+          {submitting ? 'Saving…' : 'Submit questionnaire'}
+        </button>
       </div>
     </div>
   )

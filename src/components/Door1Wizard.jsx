@@ -14,6 +14,8 @@ import {
 export default function Door1Wizard({ answers, onChange, onSubmit, onBack }) {
   const [index, setIndex] = useState(0)
   const [showErrors, setShowErrors] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   const section = SECTIONS[index]
   const isLast = index === SECTIONS.length - 1
@@ -41,7 +43,7 @@ export default function Door1Wizard({ answers, onChange, onSubmit, onBack }) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const submit = () => {
+  const submit = async () => {
     // Validate every section — the bypass choice can change what is required.
     for (let i = 0; i < SECTIONS.length; i++) {
       if (Object.keys(validateSection(SECTIONS[i], answers)).length > 0) {
@@ -51,7 +53,15 @@ export default function Door1Wizard({ answers, onChange, onSubmit, onBack }) {
         return
       }
     }
-    onSubmit(answers)
+    // Persist the linked submission before confirming. A failed insert keeps the
+    // answers in place and lets the supplier retry — the record is never lost.
+    setSubmitError('')
+    setSubmitting(true)
+    const { error } = await onSubmit(answers)
+    setSubmitting(false)
+    if (error) {
+      setSubmitError('We could not save your submission just now. Please try again.')
+    }
   }
 
   return (
@@ -101,6 +111,11 @@ export default function Door1Wizard({ answers, onChange, onSubmit, onBack }) {
         ))}
       </form>
 
+      {/* Submission-insert failure — inline, retry-able */}
+      {submitError && (
+        <div className="gate-submit-error" role="alert">{submitError}</div>
+      )}
+
       {/* Navigation */}
       <div className="wizard-nav">
         <button type="button" className="tc-btn-ghost" onClick={goBack}>
@@ -114,7 +129,9 @@ export default function Door1Wizard({ answers, onChange, onSubmit, onBack }) {
               : 'Required fields must be complete to continue.'}
         </div>
         {isLast ? (
-          <button type="button" className="tc-btn-primary" onClick={submit}>Submit questionnaire</button>
+          <button type="button" className="tc-btn-primary" onClick={submit} disabled={submitting}>
+            {submitting ? 'Saving…' : 'Submit questionnaire'}
+          </button>
         ) : (
           <button type="button" className="tc-btn-primary" onClick={goNext}>Next · {SECTIONS[index + 1].id}</button>
         )}
