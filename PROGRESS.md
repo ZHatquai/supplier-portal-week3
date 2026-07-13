@@ -47,15 +47,18 @@ D3+A1), and the **GDPR consent** step.
   since org egress blocks supabase.co from this sandbox).
 
 ## Remaining work
-- [ ] **Deploy to Netlify** (push to main → auto-deploy). Before/at first deploy,
-      add the two env vars in the Netlify dashboard (Netlify MCP not active):
-      `VITE_SUPABASE_URL=https://qdqvpctmotquybvtzwzs.supabase.co` and
-      `VITE_SUPABASE_ANON_KEY` (anon/public key from Supabase → Settings → API).
-- [ ] **Confirm live inserts from the deployed site** (acceptance criterion 15) —
-      a real Gate submit creates a `suppliers` row, a completed door creates a linked
-      `submissions` row. This could not be exercised locally because the sandbox
-      egress policy blocks supabase.co; the DB-level insert-only behaviour and the
-      frontend wiring are both verified, so this is the one check left for deploy.
+- [ ] **Supply `VITE_SUPABASE_ANON_KEY` to the build.** The Netlify dashboard env
+      vars are **locked**, so `VITE_SUPABASE_URL` is now committed in `netlify.toml`
+      (`[build.environment]`) — but the anon key is deliberately NOT committed. The
+      live site loads but every insert fails (inline retry) until the anon key
+      reaches the build. Unlock the Netlify env var, or decide another injection
+      path, then redeploy. (Anon key: Supabase → Settings → API.)
+- [ ] **Deploy to Netlify** (push to main → auto-deploy).
+- [ ] **Confirm live inserts from the deployed site** (acceptance criterion 15),
+      once the anon key is in place — a real Gate submit creates a `suppliers` row, a
+      completed door creates a linked `submissions` row. This could not be exercised
+      locally because the sandbox egress policy blocks supabase.co; the DB-level
+      insert-only behaviour and the frontend wiring are both verified.
 - [ ] Record the Live URL above once deployed.
 - [ ] Confirm CTA copy "Begin Your Submission" with the builder (spec §15 open
       question) — easy to change in `Landing.jsx`.

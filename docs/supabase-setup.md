@@ -139,18 +139,23 @@ queries Supabase (acceptance criterion 9).
 
 ## Client configuration
 
-The frontend reads two build-time environment variables (Netlify env vars — never
-committed):
+The frontend reads two build-time environment variables:
 
-| Variable | Value |
-|----------|-------|
-| `VITE_SUPABASE_URL` | `https://qdqvpctmotquybvtzwzs.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | anon/public key from Supabase → Project Settings → API |
+| Variable | Where it is set | Value |
+|----------|-----------------|-------|
+| `VITE_SUPABASE_URL` | `netlify.toml` → `[build.environment]` (committed) | `https://qdqvpctmotquybvtzwzs.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | Supplied to the build separately — **not committed** | anon/public key from Supabase → Project Settings → API |
 
-The anon key is public by design (RLS restricts it to inserts) but must still only
-ever live as a Netlify env var, never hardcoded in a committed file. The service
-role key is never used by the frontend and never written to any project file; it is
-used only transiently by the Supabase MCP during schema setup.
+**Deployment note (env vars locked):** the Netlify dashboard environment variables
+are locked for this site, so the non-secret **project URL** is committed in
+`netlify.toml` to make the build self-configuring. The **anon key is deliberately
+kept out of the repo** and must be supplied to the build another way
+(`VITE_SUPABASE_ANON_KEY`). Until it is, `supabaseReady` is false: the app renders
+normally, but Gate and questionnaire inserts fail with an inline retry message and
+no row is written. The URL is the project endpoint (already public in the shipped
+bundle), not a credential; the anon key, though also public-by-design, is still not
+committed, and the service role key is never used by the frontend nor written to any
+project file (used only transiently by the Supabase MCP during schema setup).
 
 ---
 

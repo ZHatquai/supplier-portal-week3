@@ -1,8 +1,17 @@
 # The Corporate Supplier Sustainability Portal 2026
-# Static SPA. No backend, no functions, no environment variables.
+# Static SPA. No backend, no functions.
 [build]
   command = "npm run build"
   publish = "dist"
+
+# Supabase project endpoint, baked into the build. The dashboard environment
+# variables are locked for this site, so the (non-secret) project URL is set here
+# instead. The anon key is deliberately NOT committed — it must be supplied to the
+# build separately (Netlify env var VITE_SUPABASE_ANON_KEY). Until it is, the Gate
+# and questionnaire inserts will fail with an inline retry message; nothing else
+# breaks. See docs/supabase-setup.md.
+[build.environment]
+  VITE_SUPABASE_URL = "https://qdqvpctmotquybvtzwzs.supabase.co"
 
 # Single-URL app: static assets (the workbook, the PDFs) are matched first;
 # any other path falls back to the app shell.
